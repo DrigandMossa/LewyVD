@@ -195,13 +195,17 @@ For AAV you also get **Capsid / serotype** (which cells the van can enter), **De
 faster and more strongly at the cost of **half the space** — about 2,300 letters instead of
 4,700. The program recalculates every size check the moment you tick it.
 
-Each capsid and route comes with a note explaining its trade-off. One of them the program
-refuses outright: **AAV-PHP.eB** crosses from the bloodstream into the brain beautifully *in
-mice*, because it uses a mouse protein called Ly6a as its doorway. Humans have no equivalent
-protein doing that job, so the thing that makes it impressive in a mouse simply isn't there in
-a person. It's famous, it's all over the research literature, and it's one of the most common
-ways a gorgeous mouse result turns out to mean nothing for people — which is why picking it
-raises a blocking error rather than a warning you can click past.
+Each capsid and route comes with a note explaining its trade-off. One of them stops you to
+say so: pick **AAV-PHP.eB** and a dialog opens. It crosses from the bloodstream into the brain
+beautifully *in mice*, because it binds a mouse protein called Ly6a as its doorway. Humans
+have no equivalent protein doing that job, so the thing that makes it impressive in a mouse
+simply isn't there in a person. It's famous, it's all over the research literature, and it's
+one of the most common ways a gorgeous mouse result turns out to mean nothing for people.
+
+The dialog doesn't stop you. Close it and the design is built as asked, with a standing
+warning in the messages panel, because PHP.eB is a perfectly sensible choice for mouse work —
+it's the jump to a human-directed design where it falls apart. The popup is there so that
+choice is made deliberately rather than by leaving a dropdown alone.
 
 ---
 
@@ -227,8 +231,8 @@ The checks worth knowing about:
   you which ones you can safely use to assemble it.
 - **Hidden stop signals in lentivirus.** A particular short sequence inside your cargo can
   truncate the whole vector. It gets flagged.
-- **A capsid that only works in mice.** Choosing `AAV-PHP.eB` blocks the design, for the
-  reason given above.
+- **A capsid that only works in mice.** Choosing `AAV-PHP.eB` opens a dialog and leaves a
+  warning in the panel, for the reason given above.
 
 ---
 
