@@ -579,6 +579,11 @@ def build(cfg: dict) -> dict:
 
     # ---- messages: capsid, route, vector class ----
     if t == "aav":
+        if cfg["sero"] == "AAV-PHP.eB":
+            msgs.append(("b", "AAV-PHP.eB crosses the blood-brain barrier through the mouse "
+                              "Ly6a receptor, which has no human ortholog serving that role. "
+                              "It is a mouse research tool: pick another capsid for any "
+                              "human-directed design."))
         msgs.append(("i", f"{cfg['sero']}: {SEROTYPES[cfg['sero']]}"))
         msgs.append(("i", f"{cfg['route']}: {ROUTES[cfg['route']]}"))
         if cfg["route"].startswith("intravenous"):
