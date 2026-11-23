@@ -237,6 +237,20 @@ ENZYMES = {"EcoRI": "GAATTC", "BamHI": "GGATCC", "HindIII": "AAGCTT", "XhoI": "C
 BUILT_IN = {"kozak", "stop", "tag", "p2a", "term", "gslink", "kdel"}
 FROM_BOX = {"goi", "guide"}
 
+# Capsids whose headline property does not transfer to humans.  Selecting one raises a
+# dialog in the window; it does not block the design, because they are legitimate choices
+# for mouse work.
+MOUSE_ONLY_CAPSIDS = {
+    "AAV-PHP.eB":
+        "AAV-PHP.eB is a mouse research tool.\n\n"
+        "It crosses the blood-brain barrier by binding the mouse Ly6a receptor. Humans have "
+        "no equivalent receptor serving that role, so the property that makes this capsid "
+        "remarkable in mice does not carry over to a human-directed design.\n\n"
+        "This is one of the most common ways a striking mouse result fails to translate.\n\n"
+        "The design will still be built, and this capsid remains a reasonable choice for "
+        "mouse work.",
+}
+
 # --------------------------------------------------------------------------
 # Sequence helpers
 # --------------------------------------------------------------------------
@@ -579,6 +593,11 @@ def build(cfg: dict) -> dict:
 
     # ---- messages: capsid, route, vector class ----
     if t == "aav":
+        if cfg["sero"] in MOUSE_ONLY_CAPSIDS:
+            msgs.append(("w", cfg["sero"] + " crosses the blood-brain barrier through a mouse "
+                              "receptor with no human ortholog serving that role. It is a "
+                              "mouse research tool: pick another capsid for any "
+                              "human-directed design."))
         msgs.append(("i", f"{cfg['sero']}: {SEROTYPES[cfg['sero']]}"))
         msgs.append(("i", f"{cfg['route']}: {ROUTES[cfg['route']]}"))
         if cfg["route"].startswith("intravenous"):
@@ -712,6 +731,7 @@ def main() -> None:
             self.var: dict[str, tk.Variable] = {}
             self.current: dict | None = None
             self.row_ids: dict[str, str] = {}
+            self._capsid_warned = False
             self._painted: list[tuple[tk.Widget, str]] = []
             self.style = ttk.Style(self)
             try:
@@ -909,7 +929,8 @@ def main() -> None:
             self.aav_box.grid(row=r, column=0, columnspan=2, sticky="ew"); r += 1
             self.aav_box.columnconfigure(0, weight=1)
             self.aav_box.columnconfigure(1, weight=1)
-            self.combo(self.aav_box, "sero", "Capsid / serotype", SEROTYPES, 0, 0)
+            self.combo(self.aav_box, "sero", "Capsid / serotype", SEROTYPES, 0, 0,
+                       cmd=self.on_serotype)
             self.combo(self.aav_box, "route", "Delivery route", ROUTES, 0, 1)
             self.check(self.aav_box, "sc",
                        "Self-complementary (scAAV): faster onset, about half the capacity", 1)
@@ -1102,7 +1123,22 @@ def main() -> None:
                 self.aav_box.grid_remove()
             self.var["wpre"].set(vt != "plasmid")
             self.var["pa"].set("bGH" if vt == "plasmid" else "SV40")
+            self.check_capsid()
             self.render()
+
+        def on_serotype(self, _event=None):
+            self.check_capsid()
+            self.render()
+
+        def check_capsid(self):
+            """Raise a dialog on entering a mouse-only capsid; once per entry, not per edit."""
+            capsid = self.var["sero"].get()
+            mouse_only = self.var["vt"].get() == "aav" and capsid in MOUSE_ONLY_CAPSIDS
+            if mouse_only and not self._capsid_warned:
+                self._capsid_warned = True
+                messagebox.showwarning(APP_TITLE, MOUSE_ONLY_CAPSIDS[capsid], parent=self)
+            elif not mouse_only:
+                self._capsid_warned = False
 
         def on_strategy(self, keep=False):
             key = self.strat_keys[self.var["strat_name"].get()]
